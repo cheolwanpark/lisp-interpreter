@@ -1,11 +1,6 @@
 import math
 
-
-class function:
-    def __init__(self, variables, body):
-        self.variables = variables
-        self.body = body
-
+namespace = [dict()]
 
 
 def isfloat(value):
@@ -16,37 +11,59 @@ def isfloat(value):
         return False
 
 
-g_namespace = dict()
-l_namespace = []
-
-
 def add_val_in_global_namespace(name, val):
-    if name in g_namespace:
+    if name in namespace[0]:
         return False
-    g_namespace[name] = val
+    namespace[0][name] = val
     return True
 
 
 def set_val_in_global_namespace(name, val):
-    if name in g_namespace:
-        g_namespace[name] = val
+    if name in namespace[0]:
+        namespace[0][name] = val
         return True
     else:
         return False
 
 
-def find_val_in_global_namespace(name):
-    if name in g_namespace:
-        return g_namespace[name]
+def add_val_in_local_namespace(name, val):
+    if name in namespace[-1]:
+        return False
+    namespace[-1][name] = val
+    return True
+
+
+def find_val_in_namespace(name):
+    for i in reversed(range(len(namespace))):
+        if name in namespace[i]:
+            return namespace[i][name]
     return None
 
 
-def find_val_in_local_namespace(name):
-    for i in reversed(range(len(l_namespace))):
-        if name in l_namespace[i]:
-            return l_namespace[i][name]
-    return None
+class Function:
+    def __init__(self, variables, body):
+        self.variables = variables
+        self.num_of_variables = len(variables)
+        self.body = body
+        for i in range(self.num_of_variables):
+            if not isinstance(self.variables[i], str) or isfloat(self.variables[i]):
+                print("lambda function : invalid parameter name")
+                exit(-1)
 
+    def run(self, parameters):
+        count = len(parameters)
+
+        if count != self.num_of_variables:
+            print("lambda function : invalid number of operands")
+            exit(-1)
+
+        # add parameters to namespace and evaluate body
+        namespace.append(dict())
+        for i in range(count):
+            add_val_in_local_namespace(self.variables[i],  parameters[i])
+        val = evaluation(self.body)
+        namespace.pop()
+        return val
 
 
 # http://rigaux.org/language-study/syntax-across-languages-per-language/Scheme.html
@@ -186,17 +203,6 @@ def evaluation(expr):
         return math.ceil(opr[0])
 
     # control flow
-    elif "if" == operator:
-        if 2 > count or count > 3:
-            print("if : invalid number of operands %d")
-            exit(-1)
-        if opr[0]:
-            return opr[1]
-        elif count != 3:
-            print("if : missing an else expression")
-            exit(-1)
-        else:
-            return opr[2]
     elif "begin" == operator:
         return opr[-1]
 
@@ -264,13 +270,21 @@ def evaluation(expr):
         return None
 
     else:
+        # check operator is list (maybe lambda)
+        if isinstance(operator, list):
+            operator = evaluation(operator)
+            if not isinstance(operator, Function):
+                print("invalid operator")
+                exit(-1)
+            return operator.run(opr)
+
         # find in namespaces
-        val = find_val_in_local_namespace(operator)
-        if val is None:
-            val = find_val_in_global_namespace(operator)
+        val = find_val_in_namespace(operator)
         if val is None:
             print("'%s' is not defined" % operator)
             exit(-1)
+        elif isinstance(val, Function):
+            return val.run(opr)
         else:
             return val
 
@@ -291,9 +305,20 @@ def evaluation_except(expr):
                 for i in range(1, count):
                     result = evaluation(c[i])
                 return result
+    elif "if" == operator:
+        if 2 > count or count > 3:
+            print("if : invalid number of operands %d")
+            exit(-1)
+        if evaluation(opr[0]):
+            return evaluation(opr[1])
+        elif count != 3:
+            print("if : missing an else expression")
+            exit(-1)
+        else:
+            return evaluation(opr[2])
     elif "let" == operator:
         # adding local variables
-        l_namespace.append(dict())
+        namespace.append(dict())
         adding_list = []
         for v in opr[0]:
             if 2 != len(v):
@@ -307,9 +332,11 @@ def evaluation_except(expr):
                 val = evaluation([v[1]])
                 adding_list.append((v[0], val))
         for e in adding_list:
-            l_namespace[-1][e[0]] = e[1]
+            if not add_val_in_local_namespace(e[0], e[1]):
+                print("let %s is already defined" % e[0])
+                exit(-1)
         val = evaluation(opr[1])
-        l_namespace.pop()
+        namespace.pop()
         return val
     elif "define" == operator:
         if 2 != count:
@@ -337,7 +364,10 @@ def evaluation_except(expr):
         if 2 != count:
             print("lambda : invalid number of operands")
             exit(-1)
-        # TODO: Implement lambda
+        if not isinstance(opr[0], list):
+            opr[0] = [opr[0]]
+        func = Function(opr[0], opr[1])
+        return func
     else:
         return False
 

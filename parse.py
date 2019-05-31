@@ -1,6 +1,5 @@
 import re
 
-
 def preprocess(code):
     code = re.sub(r';.*\n', '', code)
     code = code.replace("\n", "")
