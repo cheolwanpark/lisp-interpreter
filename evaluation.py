@@ -11,14 +11,14 @@ def isfloat(value):
         return False
 
 
-def add_val_in_global_namespace(name, val):
+def add_var_to_global_namespace(name, val):
     if name in namespace[0]:
         return False
     namespace[0][name] = val
     return True
 
 
-def set_val_in_global_namespace(name, val):
+def set_var_in_global_namespace(name, val):
     if name in namespace[0]:
         namespace[0][name] = val
         return True
@@ -26,14 +26,14 @@ def set_val_in_global_namespace(name, val):
         return False
 
 
-def add_val_in_local_namespace(name, val):
+def add_var_to_local_namespace(name, val):
     if name in namespace[-1]:
         return False
     namespace[-1][name] = val
     return True
 
 
-def find_val_in_namespace(name):
+def find_var_in_namespace(name):
     for i in reversed(range(len(namespace))):
         if name in namespace[i]:
             return namespace[i][name]
@@ -60,17 +60,15 @@ class Function:
         # add parameters to namespace and evaluate body
         namespace.append(dict())
         for i in range(count):
-            add_val_in_local_namespace(self.variables[i],  parameters[i])
+            add_var_to_local_namespace(self.variables[i], parameters[i])
         val = evaluation(self.body)
         namespace.pop()
         return val
-
 
 # http://rigaux.org/language-study/syntax-across-languages-per-language/Scheme.html
 # based on upper web page
 # not implemented functions about string ( not handle string )
 # some functions not implemented too ( acos, asin, ..., case, ... )
-
 
 def evaluation(expr):
     if not isinstance(expr, list):
@@ -279,7 +277,7 @@ def evaluation(expr):
             return operator.run(opr)
 
         # find in namespaces
-        val = find_val_in_namespace(operator)
+        val = find_var_in_namespace(operator)
         if val is None:
             print("'%s' is not defined" % operator)
             exit(-1)
@@ -332,7 +330,7 @@ def evaluation_except(expr):
                 val = evaluation([v[1]])
                 adding_list.append((v[0], val))
         for e in adding_list:
-            if not add_val_in_local_namespace(e[0], e[1]):
+            if not add_var_to_local_namespace(e[0], e[1]):
                 print("let %s is already defined" % e[0])
                 exit(-1)
         val = evaluation(opr[1])
@@ -345,7 +343,7 @@ def evaluation_except(expr):
         if not isinstance(opr[0], str) or isfloat(opr[0]):
             print("define : name must be string word")
             exit(-1)
-        if not add_val_in_global_namespace(opr[0], evaluation(opr[1])):
+        if not add_var_to_global_namespace(opr[0], evaluation(opr[1])):
             print("define : '%s' is already defined" % opr[0])
             exit(-1)
         return None
@@ -356,7 +354,7 @@ def evaluation_except(expr):
         if not isinstance(opr[0], str) or isfloat(opr[0]):
             print("set! : name must be string word")
             exit(-1)
-        if not set_val_in_global_namespace(opr[0], evaluation(opr[1])):
+        if not set_var_in_global_namespace(opr[0], evaluation(opr[1])):
             print("set : '%s' is not defined" % opr[0])
             exit(-1)
         return None
@@ -370,23 +368,5 @@ def evaluation_except(expr):
         return func
     else:
         return False
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

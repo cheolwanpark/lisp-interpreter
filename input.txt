@@ -18,15 +18,18 @@
 (write 2) (write 3) (writeln 5)
 ((lambda (a b) (+ a b)) 1 2)
 (define add (lambda (a b) (+ a b)))
-(add 1 2)
-(define identical (lambda (n) (+ n)))
+(add 3 4)
+(define identical (lambda (n) (- (+ n 1) 1)))
 (identical 1)
 (define fac (lambda (n) (
     if (< n 1) 1 (* n (fac (- n 1))))))
 (fac 50)
 (define fun (lambda (n) (begin
     (if (> n 10)
-        (define funfun (lambda (a b) (* a b)))                          ; this is not allowed in scheme but i just allowed it
+        (define funfun (lambda (a b) (* a b)))                          ; this is not allowed in scheme
         (define funfun (lambda (a b) (/ a b)))))))
 (fun 0)
 (funfun 5 6)
+(define sumN (lambda (n) (
+    if (< n 1) 0 (+ n (sumN (- n 1))))))
+(sumN 100)

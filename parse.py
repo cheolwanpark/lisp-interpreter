@@ -36,7 +36,7 @@ def parse_parentheses_and_spaces(s):
         exit(-1)
     others = s[processed:].split()
     count = len(others)
-    if count > 1:
+    if 0 != len(result):
         for i in range(count):
             result.append(others[i])
     return result
