@@ -35,13 +35,18 @@ def parse_parentheses_and_spaces(s):
     if count != 0:
         print("invalid parentheses")
         exit(-1)
+    others = s[processed:].split()
+    count = len(others)
+    if count > 1:
+        for i in range(count):
+            result.append(others[i])
     return result
 
 
-def parse(str):
-    parsed = parse_parentheses_and_spaces(str)
+def parse(s):
+    parsed = parse_parentheses_and_spaces(s)
     if 0 == len(parsed):
-        result = str.split()
+        result = s.split()
         if 1 == len(result):
             return result[0]
         else:

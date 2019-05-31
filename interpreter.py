@@ -9,7 +9,8 @@ code = parse.preprocess(code)
 code = parse.parse(code)
 for c in code:
     val = evaluation.evaluation(c)
-    print(val)
+    if None is not val:
+        print(val)
 
 
 
