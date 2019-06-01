@@ -153,6 +153,9 @@ def evaluation(expr):
         if 2 != count:
             print("remainder : invalid number of operands")
             exit(-1)
+        if not opr[0].is_integer() or not opr[1].is_integer():
+            print("remainder : invalid operand, operand must be integer")
+            exit(-1)
         return float(int(opr[0]) % int(opr[1]))
     elif "exp" == operator:
         if 1 != count:
@@ -250,21 +253,27 @@ def evaluation(expr):
         if 1 != count:
             print("zero? : invalid number of operands")
             exit(-1)
-        if 0 == opr[0]:
-            return True
-        else:
+        if not opr[0].is_integer() or int(opr[0]) != 0:
             return False
+        else:
+            return True
     elif "write" == operator:
         if 1 != count:
             print("write : invalid number of operands")
             exit(-1)
-        print(opr[0], end='')
+        val = opr[0]
+        if val.is_integer():
+            val = int(val)
+        print(val, end='')
         return None
     elif "writeln" == operator:
         if 1 != count:
             print("writeln : invalid number of operands")
             exit(-1)
-        print(opr[0])
+        val = opr[0]
+        if val.is_integer():
+            val = int(val)
+        print(val)
         return None
 
     else:

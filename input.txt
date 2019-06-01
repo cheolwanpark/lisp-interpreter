@@ -22,7 +22,7 @@
 (define identical (lambda (n) (- (+ n 1) 1)))
 (identical 1)
 (define fac (lambda (n) (
-    if (< n 1) 1 (* n (fac (- n 1))))))
+    if (zero? n) 1 (* n (fac (- n 1))))))
 (fac 50)
 (define fun (lambda (n) (begin
     (if (> n 10)

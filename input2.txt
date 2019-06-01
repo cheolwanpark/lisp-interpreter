@@ -1,2 +1,0 @@
-(define identical (lambda (n) (- (+ n 1) 1)))
-(identical 1)
