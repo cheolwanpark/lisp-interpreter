@@ -1,0 +1,23 @@
+
+<digit> ::= [0-9]
+<alphabet> ::= [a-z] | [A-z]
+<character> ::= (all ascii character)
+<int_num> ::= <digit>+
+<float_num> ::= <int_num>("."<int_num>)?(("e"|"E")<int_num>)?
+<number> ::= <int_num>|<float_num>
+<string> ::= "\""<character>*"\""
+
+
+**** consider multiple spaces as singular space ****
+
+<identifier> ::= (<alphabet>|"_")(<alphabet>|<digit>)*
+<sentence> ::= ("("<operator>(" "<operand>)*")")|<statements>|<values>
+<operator> ::= <lambda>|<identifier>
+<operand> ::= <identifier>|<sentence>
+<values> ::= <identifier>|<number>|<string>
+<statements> ::= <cond_statement>|<if_statement>
+<cond_statement> ::= "(cond"("( ""("<sentence>")"(" "<sentence>)+")")+")"
+<if_statement> ::= "(if"" ("<sentence>")"" "<sentence>" "<sentence>")"
+
+
+
